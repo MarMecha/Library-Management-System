@@ -7,7 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Getter
+@Setter
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -17,8 +22,14 @@ public class Category {
     private Long id;
 
     @NotBlank(message = "Category is required")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+
+    public Long getId(){return id;}
+    public void setId(Long id){this.id = id;}
+
+    public String getName(){return name;}
+    public void setName(String name){this.name = name;}
 
 
 }

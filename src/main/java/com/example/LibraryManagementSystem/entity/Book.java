@@ -7,7 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "books")
 public class Book {
@@ -24,11 +29,11 @@ public class Book {
     @Column(nullable = false, unique = true)
     private String isbn;
 
-    @NotBlank(message = "Publication year is required")
+    @NotNull(message = "Publication year is required")
     @Column(nullable = false)
     private Integer publicationYear;
 
-    @NotBlank(message = "Stock is required")
+    @NotNull(message = "Stock is required")
     @Column(nullable = false)
     private Integer totalCopies;
 
