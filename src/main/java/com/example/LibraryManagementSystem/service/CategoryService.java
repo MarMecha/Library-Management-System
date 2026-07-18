@@ -47,6 +47,19 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
     
+    public Category findByCategoryName(String name){
+        return categoryRepository
+            .findByNameIgnoreCase(name.trim())
+            .orElseThrow(()->
+                new RuntimeException("Category not found!")
+            );
+    }
+
+    public List<Category> findByCategoryNameLoose(String name){
+        return categoryRepository
+                .findByNameContainingIgnoreCase(name.trim());
+    }
+
     public Category update(Long id, Category category){
         
         Category existingCategory = categoryRepository.findById(id)

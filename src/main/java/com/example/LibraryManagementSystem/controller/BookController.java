@@ -1,6 +1,7 @@
 package com.example.LibraryManagementSystem.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.LibraryManagementSystem.entity.Book;
@@ -30,8 +31,10 @@ public class BookController {
     }
     
     @PostMapping
-    public Book create(@Valid @RequestBody Book book) {
-        return bookService.save(book);
+    public Book create(@Valid @RequestBody Book book, 
+                    @RequestParam Long categoryId, 
+                    @RequestParam List<Long> authorIds) {
+        return bookService.save(book, categoryId, authorIds);
     }
     
     @GetMapping
@@ -44,6 +47,17 @@ public class BookController {
         return bookService.findById(id);
     }
     
+
+    @GetMapping("/search/full-title")
+    public Book findByTitle(@RequestParam String title){
+        return bookService.findByTitle(title);
+    }
+    
+    @GetMapping("/search")
+    public List<Book> searchLoose(@RequestParam String title){
+        return bookService.findByTitleLoose(title);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
         bookService.delete(id);

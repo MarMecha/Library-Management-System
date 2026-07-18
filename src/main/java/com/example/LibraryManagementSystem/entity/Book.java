@@ -1,10 +1,17 @@
 package com.example.LibraryManagementSystem.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -37,5 +44,21 @@ public class Book {
     @Column(nullable = false)
     private Integer totalCopies;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
+    public Category getCategory(){return category;}
+    public void setCategory(Category category){this.category = category;}
+    
+    @ManyToMany
+    @JoinTable(
+        name = "book_authors",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
+    private Set<Author> authors = new HashSet<>();
+
+    public Set<Author> getAuthors(){return authors;}
+    public void setAuthors(Set<Author> authors){this.authors = authors;}
 }
