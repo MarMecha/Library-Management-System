@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.LibraryManagementSystem.entity.Author;
+import com.example.LibraryManagementSystem.exception.AuthorAlreadyExistsException;
 import com.example.LibraryManagementSystem.exception.CategoryAlreadyExistsException;
 import com.example.LibraryManagementSystem.repository.AuthorRepository;
 
@@ -19,12 +20,12 @@ public class AuthorService {
 
     public Author save(Author author){
         String normalizedFirstName = author.getFirstName()
-                                            .trim()
-                                            .toUpperCase();
-        
+                .trim()
+                .toUpperCase();
+
         String normalizedLastName = author.getLastName()
-                                            .trim()
-                                            .toUpperCase();
+                .trim()
+                .toUpperCase();
         
                                             
         if (authorRepository.existsByFirstNameAndLastName(normalizedFirstName,
@@ -39,6 +40,37 @@ public class AuthorService {
         author.setLastName(normalizedLastName);
 
         return authorRepository.save(author);
+    }
+
+    public Author update(Long id, Author author){
+        Author existingAuthor = authorRepository.findById(id)
+            .orElseThrow(() ->
+                new RuntimeException("Author not Found!")
+        );
+
+        String normalizedFirstName = author.getFirstName()
+                .trim() 
+                .toUpperCase();
+
+        String normalizedLastName = author.getLastName()
+                .trim()
+                .toUpperCase();
+
+        boolean alreadyExists =
+                authorRepository.existsByFirstNameAndLastNameAndIdNot(
+                        normalizedFirstName,
+                        normalizedLastName,
+                        id
+                );
+
+        if(alreadyExists) {
+            throw new AuthorAlreadyExistsException("Author already exists");
+        }
+
+        existingAuthor.setFirstName(normalizedFirstName);
+        existingAuthor.setLastName(normalizedLastName);
+
+        return authorRepository.save(existingAuthor);
     }
 
     public List<Author> findAll(){

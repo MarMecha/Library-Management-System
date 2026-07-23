@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,6 +41,7 @@ public class Book {
     @Column(nullable = false)
     private Integer publicationYear;
 
+    @Positive
     @NotNull(message = "Stock is required")
     @Column(nullable = false)
     private Integer totalCopies;

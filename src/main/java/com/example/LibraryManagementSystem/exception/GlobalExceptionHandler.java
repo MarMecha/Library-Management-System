@@ -14,44 +14,77 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(
-            MethodArgumentNotValidException exception) {
 
-        Map<String, String> validationErrors = new HashMap<>();
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<Map<String, Object>> handleValidationErrors(
+                MethodArgumentNotValidException exception) {
 
-        exception.getBindingResult()
-                .getFieldErrors()
-                .forEach(error ->
-                        validationErrors.put(
-                                error.getField(),
-                                error.getDefaultMessage()
-                        )
-                );
+                Map<String, String> validationErrors = new HashMap<>();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Validation failed");
-        response.put("validationErrors", validationErrors);
+                exception.getBindingResult()
+                        .getFieldErrors()
+                        .forEach(error ->
+                                validationErrors.put(
+                                        error.getField(),
+                                        error.getDefaultMessage()
+                                )
+                        );
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
-    }
+                Map<String, Object> response = new HashMap<>();
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.BAD_REQUEST.value());
+                response.put("error", "Validation failed");
+                response.put("validationErrors", validationErrors);
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleDatabaseConstraint(
-            DataIntegrityViolationException exception) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(response);
+        }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.CONFLICT.value());
-        response.put("error", "Database constraint violation");
-        response.put("message", "Email already exists");
+        @ExceptionHandler(DataIntegrityViolationException.class)
+        public ResponseEntity<Map<String, Object>> handleDatabaseConstraint(
+                DataIntegrityViolationException exception) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(response);
-    }
+                Map<String, Object> response = new HashMap<>();
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.CONFLICT.value());
+                response.put("error", "Database constraint violation");
+                response.put("message", "Email already exists");
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(response);
+        }
+
+        @ExceptionHandler(LoanNotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleLoanNotFound(
+                LoanNotFoundException exception) {
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.NOT_FOUND.value());
+                response.put("error", "Loan not found");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(response);
+        }
+        @ExceptionHandler({
+                NoAvailableCopiesException.class,
+                LoadAlreadyReturnedException.class
+                })
+        public ResponseEntity<Map<String, Object>> handleLoanConflict(
+                RuntimeException exception) {
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.CONFLICT.value());
+                response.put("error", "Loan conflict");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(response);
+        }
 }

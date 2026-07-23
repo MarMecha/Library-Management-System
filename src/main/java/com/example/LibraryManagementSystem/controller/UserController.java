@@ -3,21 +3,15 @@ package com.example.LibraryManagementSystem.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.entity.User;
+import com.example.LibraryManagementSystem.dto.UserDtos.UserResponse;
 import com.example.LibraryManagementSystem.service.UserService;
 
-import jakarta.validation.Valid;
-
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 @RestController
 @RequestMapping("/users")
@@ -29,19 +23,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        return userService.save(user);
-    }
-
     @GetMapping
-    public List<User> getAll(){
-        return userService.findAll();
+    public List<UserResponse> getAll(){
+        return userService.findAll()
+            .stream()
+            .map(UserResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getById(@PathVariable Long id) {
-        return userService.findById(id);
+    public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
+        return userService.findById(id)
+            .map(UserResponse::from)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     @DeleteMapping("/{id}")

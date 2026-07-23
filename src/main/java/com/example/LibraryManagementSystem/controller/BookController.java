@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -35,6 +36,15 @@ public class BookController {
                     @RequestParam Long categoryId, 
                     @RequestParam List<Long> authorIds) {
         return bookService.save(book, categoryId, authorIds);
+    }
+    
+    @PutMapping("/{id}")
+    public Book update(@PathVariable Long id,
+                    @Valid @RequestBody Book book,
+                    @RequestParam Long categoryId,
+                    @RequestParam List<Long> authorIds){
+
+        return bookService.update(id, book, categoryId, authorIds);
     }
     
     @GetMapping

@@ -44,7 +44,7 @@ public class BookService {
         }
         
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> 
+                .orElseThrow(() ->
                         new RuntimeException("Category not found!")
                 );
 
@@ -65,6 +65,47 @@ public class BookService {
         book.setAuthors(authors);
 
         return bookRepository.save(book);
+    }
+
+    public Book update(Long id, Book book, Long categoryId, List<Long> authorIds){
+
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() ->
+                    new RuntimeException("Book not found!")
+            );
+
+        String normalizedIsbn = book.getIsbn()
+                .trim()
+                .toUpperCase();
+
+        if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(normalizedIsbn, id)){
+            throw new BookAlreadyExistsException("Book with this ISBN already exists!");
+        }
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> 
+                    new RuntimeException("Category not found!")
+            );
+
+        Set<Author> authors = new HashSet<>();
+
+        for (Long authorId : authorIds){
+            Author author = authorRepository.findById(authorId)
+                    .orElseThrow(() ->
+                        new RuntimeException("Author not found!")
+                );
+
+            authors.add(author);
+        }
+
+        existingBook.setTitle(book.getTitle().trim());
+        existingBook.setIsbn(normalizedIsbn);
+        existingBook.setPublicationYear(book.getPublicationYear());
+        existingBook.setTotalCopies(book.getTotalCopies());
+        existingBook.setCategory(category);
+        existingBook.setAuthors(authors);
+
+        return bookRepository.save(existingBook);
     }
 
     public void delete(Long id){
