@@ -34,7 +34,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception{
+                JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception{
     
         return http
             .csrf(AbstractHttpConfigurer::disable)
@@ -50,6 +50,21 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/error").permitAll()
+
+                .requestMatchers(HttpMethod.GET,
+                                "/loans/me",
+                                "/loans/me/**"
+                ).authenticated()
+                .requestMatchers(HttpMethod.PATCH,
+                                "/loans/me/*/return"
+                ).authenticated()
+                .requestMatchers(HttpMethod.GET,
+                                "/loans",
+                                "/loans/**"
+                ).hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH,
+                               "/loans/**"
+                ).hasRole("ADMIN")    
 
                 .requestMatchers(HttpMethod.POST, 
                                 "/books/**",
@@ -70,7 +85,7 @@ public class SecurityConfig {
                                 ).hasRole("ADMIN")
 
                 .requestMatchers("/users/**").hasRole("ADMIN")
-                
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

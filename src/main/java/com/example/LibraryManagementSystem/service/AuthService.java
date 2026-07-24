@@ -14,6 +14,7 @@ import com.example.LibraryManagementSystem.dto.UserDtos.LoginRequest;
 import com.example.LibraryManagementSystem.dto.UserDtos.RegisterRequest;
 import com.example.LibraryManagementSystem.entity.Role;
 import com.example.LibraryManagementSystem.entity.User;
+import com.example.LibraryManagementSystem.exception.EmailAlreadyExistsException;
 import com.example.LibraryManagementSystem.repository.UserRepository;
 import com.example.LibraryManagementSystem.security.JwtService;
 
@@ -41,7 +42,7 @@ public class AuthService {
             .toLowerCase(Locale.ROOT);
         
         if (userRepository.existsByEmail(email)){
-            throw new IllegalArgumentException("Email is already registered!");
+            throw new EmailAlreadyExistsException("Email is already registered!");
         }
 
         User user = new User();

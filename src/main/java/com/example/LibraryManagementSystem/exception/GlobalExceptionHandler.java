@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
         }
         @ExceptionHandler({
                 NoAvailableCopiesException.class,
-                LoadAlreadyReturnedException.class
+                LoanAlreadyReturnedException.class
                 })
         public ResponseEntity<Map<String, Object>> handleLoanConflict(
                 RuntimeException exception) {
@@ -85,6 +86,38 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
+                        .body(response);
+        }
+        @ExceptionHandler(EmailAlreadyExistsException.class)
+        public ResponseEntity<Map<String, Object>> 
+                handleEmailAlreadyExists(
+                        EmailAlreadyExistsException exception){
+                
+                Map<String, Object> response = new HashMap<>();
+
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.CONFLICT.value());
+                response.put("error", "Email already registered!");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(response);
+        }
+
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<Map<String, Object>>
+                handleBadCredentials(BadCredentialsException exception){
+
+                Map<String, Object> response = new HashMap<>();
+
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.UNAUTHORIZED.value());
+                response.put("error", "Invalid credentials");
+                response.put("message", "Email or password is incorrect");
+
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
                         .body(response);
         }
 }

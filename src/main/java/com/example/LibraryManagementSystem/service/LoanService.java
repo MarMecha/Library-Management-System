@@ -10,6 +10,7 @@ import com.example.LibraryManagementSystem.entity.Book;
 import com.example.LibraryManagementSystem.entity.Loan;
 import com.example.LibraryManagementSystem.entity.LoanStatus;
 import com.example.LibraryManagementSystem.entity.User;
+import com.example.LibraryManagementSystem.exception.LoanAlreadyReturnedException;
 import com.example.LibraryManagementSystem.exception.LoanNotFoundException;
 import com.example.LibraryManagementSystem.exception.NoAvailableCopiesException;
 import com.example.LibraryManagementSystem.repository.BookRepository;
@@ -68,32 +69,51 @@ public class LoanService {
                 new LoanNotFoundException("Loan not found!")
             );
 
+        return completeReturn(loan);
+    }
+    
+    public Loan returnMyLoan(Long loanId, String email) {
+        Loan loan = loanRepository
+            .findByIdAndUserEmail(loanId, email)
+            .orElseThrow(() ->
+                new LoanNotFoundException("Loan not found!")
+            );
+
+        return completeReturn(loan);
+    }
+
+    private Loan completeReturn(Loan loan) {
         if (loan.getReturnDate() != null) {
-            throw new NoAvailableCopiesException("Loan has already been returned!");
+            throw new LoanAlreadyReturnedException(
+                "Loan has already been returned!"
+            );
         }
 
         LocalDate returnDate = LocalDate.now();
 
-        if(returnDate.isAfter(loan.getDueDate())){
+        if (returnDate.isAfter(loan.getDueDate())) {
             long overdueDays = ChronoUnit.DAYS.between(
-                        loan.getDueDate(),
-                        returnDate
-                        );
-            
+                loan.getDueDate(),
+                returnDate
+            );
+
             int finePerDay = 1;
-            int fineAmount = Math.toIntExact(overdueDays * finePerDay);
+
+            int fineAmount = Math.toIntExact(
+                overdueDays * finePerDay
+            );
 
             loan.setFineAmount(fineAmount);
         } else {
             loan.setFineAmount(0);
         }
 
-        loan.setReturnDate(LocalDate.now());
+        loan.setReturnDate(returnDate);
         loan.setLoanStatus(LoanStatus.RETURNED);
 
         return loanRepository.save(loan);
     }
-    
+
     public List<Loan> findAll(){
         return loanRepository.findAll();
     }
@@ -123,5 +143,21 @@ public class LoanService {
         }
 
         return loanRepository.findByUserIdAndReturnDateIsNull(userId);
+    }
+
+    public List<Loan> findMyLoans(String email) {
+        return loanRepository.findByUserEmail(email);
+    }
+
+    public List<Loan> findMyActiveLoans(String email) {
+        return loanRepository
+            .findByUserEmailAndReturnDateIsNull(email);
+    }
+
+    public Loan findMyLoanById(Long loanId, String email){
+        return loanRepository.findByIdAndUserEmail(loanId, email)
+            .orElseThrow(() ->
+                new LoanNotFoundException("Loan not found!")
+        );
     }
 }
