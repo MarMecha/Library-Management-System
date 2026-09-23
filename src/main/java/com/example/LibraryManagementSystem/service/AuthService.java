@@ -9,9 +9,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.LibraryManagementSystem.dto.UserDtos.AuthResponse;
-import com.example.LibraryManagementSystem.dto.UserDtos.LoginRequest;
-import com.example.LibraryManagementSystem.dto.UserDtos.RegisterRequest;
+import com.example.LibraryManagementSystem.dto.user.AuthResponse;
+import com.example.LibraryManagementSystem.dto.user.LoginRequest;
+import com.example.LibraryManagementSystem.dto.user.RegisterRequest;
 import com.example.LibraryManagementSystem.entity.Role;
 import com.example.LibraryManagementSystem.entity.User;
 import com.example.LibraryManagementSystem.exception.EmailAlreadyExistsException;

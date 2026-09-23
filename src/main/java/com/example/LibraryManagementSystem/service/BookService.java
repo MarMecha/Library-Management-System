@@ -2,15 +2,18 @@ package com.example.LibraryManagementSystem.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.example.LibraryManagementSystem.dto.book.BookRequest;
 import com.example.LibraryManagementSystem.entity.Author;
 import com.example.LibraryManagementSystem.entity.Book;
 import com.example.LibraryManagementSystem.entity.Category;
+import com.example.LibraryManagementSystem.exception.AuthorNotFoundException;
 import com.example.LibraryManagementSystem.exception.BookAlreadyExistsException;
+import com.example.LibraryManagementSystem.exception.BookNotFoundException;
+import com.example.LibraryManagementSystem.exception.CategoryNotFoundException;
 import com.example.LibraryManagementSystem.repository.AuthorRepository;
 import com.example.LibraryManagementSystem.repository.BookRepository;
 import com.example.LibraryManagementSystem.repository.CategoryRepository;
@@ -32,8 +35,8 @@ public class BookService {
     }
 
     
-    public Book save(Book book, Long categoryId, List<Long> authorIds){
-        String normalizedIsbn = book.getIsbn()
+    public Book save(BookRequest request){
+        String normalizedIsbn = request.isbn()
             .trim()
             .toUpperCase();
 
@@ -43,65 +46,70 @@ public class BookService {
             );
         }
         
-        Category category = categoryRepository.findById(categoryId)
+        Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found!")
+                        new CategoryNotFoundException("Category not found!")
                 );
 
         Set<Author> authors = new HashSet<>();
 
-        for (Long authorId : authorIds){
+        for (Long authorId : request.authorIds()){
             Author author = authorRepository.findById(authorId)
                 .orElseThrow(()->
-                        new RuntimeException("Author not found!")
+                        new AuthorNotFoundException("Author not found!")
                 );
             authors.add(author);
         }
         
+        Book book = new Book();
 
+        book.setTitle(request.title().trim());
         book.setIsbn(normalizedIsbn);
-        book.setTitle(book.getTitle().trim());
+        book.setPublicationYear(request.publicationYear());
+        book.setTotalCopies(request.totalCopies());
         book.setCategory(category);
         book.setAuthors(authors);
 
         return bookRepository.save(book);
     }
 
-    public Book update(Long id, Book book, Long categoryId, List<Long> authorIds){
+    public Book update(Long id, BookRequest request){
 
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() ->
-                    new RuntimeException("Book not found!")
+                    new BookNotFoundException("Book not found!")
             );
 
-        String normalizedIsbn = book.getIsbn()
+        String normalizedIsbn = request.isbn()
                 .trim()
                 .toUpperCase();
 
         if (bookRepository.existsByIsbnIgnoreCaseAndIdNot(normalizedIsbn, id)){
-            throw new BookAlreadyExistsException("Book with this ISBN already exists!");
+            throw new BookAlreadyExistsException(
+                "Book with this ISBN already exists!"
+            );
         }
 
-        Category category = categoryRepository.findById(categoryId)
+        Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> 
-                    new RuntimeException("Category not found!")
+                    new CategoryNotFoundException("Category not found!")
             );
 
         Set<Author> authors = new HashSet<>();
 
-        for (Long authorId : authorIds){
+        for (Long authorId : request.authorIds()){
             Author author = authorRepository.findById(authorId)
                     .orElseThrow(() ->
-                        new RuntimeException("Author not found!")
+                        new AuthorNotFoundException("Author not found!")
                 );
 
             authors.add(author);
         }
 
-        existingBook.setTitle(book.getTitle().trim());
+        existingBook.setTitle(request.title().trim());
         existingBook.setIsbn(normalizedIsbn);
-        existingBook.setPublicationYear(book.getPublicationYear());
-        existingBook.setTotalCopies(book.getTotalCopies());
+        existingBook.setPublicationYear(request.publicationYear());
+        existingBook.setTotalCopies(request.totalCopies());
         existingBook.setCategory(category);
         existingBook.setAuthors(authors);
 
@@ -116,8 +124,11 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Optional<Book> findById(Long id){
-        return bookRepository.findById(id);
+    public Book findById(Long id){
+        return bookRepository.findById(id)
+            .orElseThrow(() ->
+                new BookNotFoundException("Book not found!")
+        );
     }
 
     public Book findByTitle(String title){
@@ -126,7 +137,7 @@ public class BookService {
                 title.trim()
             )
             .orElseThrow(()->
-                new RuntimeException("Book not found!")
+                new BookNotFoundException("Book not found!")
             );
     }
 

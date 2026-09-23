@@ -1,9 +1,8 @@
 package com.example.LibraryManagementSystem.controller;
 
-
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.entity.Category;
+import com.example.LibraryManagementSystem.dto.category.CategoryRequest;
+import com.example.LibraryManagementSystem.dto.category.CategoryResponse;
 import com.example.LibraryManagementSystem.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -31,23 +32,34 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category create(@Valid @RequestBody Category category){
-        return categoryService.save(category);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
+
+        return CategoryResponse.from(categoryService.save(request));
     }
 
     @GetMapping
-    public List<Category> findAll(){
-        return categoryService.findAll();
+    public List<CategoryResponse> findAll(){
+        return categoryService.findAll()
+            .stream()
+            .map(CategoryResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<Category> findById(@PathVariable Long id) {
-        return categoryService.findById(id);
+    public ResponseEntity<CategoryResponse> findById(@PathVariable Long id) {
+        return categoryService.findById(id)
+            .map(CategoryResponse::from)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> 
+                ResponseEntity.notFound().build()
+            );
     }
 
     @PutMapping("/{id}")
-    public Category update(@PathVariable Long id, @Valid @RequestBody Category category){
-        return categoryService.update(id, category);
+    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest request){
+
+        return CategoryResponse.from(categoryService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

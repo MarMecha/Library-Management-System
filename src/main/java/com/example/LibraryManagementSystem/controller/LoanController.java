@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.dto.LoanDtos.LoanResponse;
+import com.example.LibraryManagementSystem.dto.loan.LoanResponse;
 import com.example.LibraryManagementSystem.service.LoanService;
 
 import java.util.List;

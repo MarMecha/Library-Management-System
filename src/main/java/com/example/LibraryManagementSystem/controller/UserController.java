@@ -3,7 +3,7 @@ package com.example.LibraryManagementSystem.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.dto.UserDtos.UserResponse;
+import com.example.LibraryManagementSystem.dto.user.UserResponse;
 import com.example.LibraryManagementSystem.service.UserService;
 
 import java.util.List;

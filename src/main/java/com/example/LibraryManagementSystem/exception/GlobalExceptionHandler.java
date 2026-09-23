@@ -57,20 +57,6 @@ public class GlobalExceptionHandler {
                         .body(response);
         }
 
-        @ExceptionHandler(LoanNotFoundException.class)
-        public ResponseEntity<Map<String, Object>> handleLoanNotFound(
-                LoanNotFoundException exception) {
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("timestamp", LocalDateTime.now());
-                response.put("status", HttpStatus.NOT_FOUND.value());
-                response.put("error", "Loan not found");
-                response.put("message", exception.getMessage());
-
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body(response);
-        }
         @ExceptionHandler({
                 NoAvailableCopiesException.class,
                 LoanAlreadyReturnedException.class
@@ -118,6 +104,47 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED)
+                        .body(response);
+        }
+
+        @ExceptionHandler({
+        CategoryAlreadyExistsException.class,
+        AuthorAlreadyExistsException.class,
+        BookAlreadyExistsException.class,
+        })
+        public ResponseEntity<Map<String, Object>>
+                handleCatalogConflict(RuntimeException exception) {
+
+                Map<String, Object> response = new HashMap<>();
+
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.CONFLICT.value());
+                response.put("error", "Resource already exists");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(response);
+        }
+
+        @ExceptionHandler({
+        BookNotFoundException.class,
+        CategoryNotFoundException.class,
+        AuthorNotFoundException.class,
+        LoanNotFoundException.class
+        })
+        public ResponseEntity<Map<String, Object>> handleResourceNotFound(
+                RuntimeException exception) {
+
+                Map<String, Object> response = new HashMap<>();
+
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.NOT_FOUND.value());
+                response.put("error", "Resource not found");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
                         .body(response);
         }
 }

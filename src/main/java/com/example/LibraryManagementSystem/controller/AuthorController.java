@@ -1,8 +1,8 @@
 package com.example.LibraryManagementSystem.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.example.LibraryManagementSystem.entity.Author;
+import com.example.LibraryManagementSystem.dto.author.AuthorRequest;
+import com.example.LibraryManagementSystem.dto.author.AuthorResponse;
 import com.example.LibraryManagementSystem.service.AuthorService;
 
 import jakarta.validation.Valid;
@@ -30,33 +32,52 @@ public class AuthorController {
     } 
 
     @PostMapping
-    public Author create(@Valid @RequestBody Author author){
-        return authorService.save(author);
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthorResponse create(@Valid @RequestBody AuthorRequest request){
+        return AuthorResponse.from(
+            authorService.save(request));
     }    
 
     @PutMapping("/{id}") //PUT /authors/1
-    public Author update(@PathVariable Long id, @Valid @RequestBody Author author){
-        return authorService.update(id, author);
+    public AuthorResponse update(@PathVariable Long id, @Valid @RequestBody AuthorRequest request){
+        return AuthorResponse.from(
+            authorService.update(id, request));
     }
 
     @GetMapping
-    public List<Author> findAll(){
-        return authorService.findAll();
+    public List<AuthorResponse> findAll(){
+        return authorService.findAll()
+            .stream()
+            .map(AuthorResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<Author> findById(@PathVariable Long id){
-        return authorService.findById(id);
+    public ResponseEntity<AuthorResponse> findById(@PathVariable Long id){
+        return authorService.findById(id)
+            .map(AuthorResponse::from)
+            .map(ResponseEntity::ok)
+            .orElseGet(() ->
+                ResponseEntity.notFound().build()
+        );
     }
 
     @GetMapping("/search/full-name")
-    public Author findByFullName(@RequestParam String firstName, @RequestParam String lastName) {
-        return authorService.findByAuthorFullName(firstName, lastName);
+    public AuthorResponse findByFullName(@RequestParam String firstName, @RequestParam String lastName) {
+        return AuthorResponse.from(
+            authorService.findByAuthorFullName(
+                firstName, 
+                lastName
+            )
+        );
     }
 
     @GetMapping("/search")
-    public List<Author> searchLoose(@RequestParam String name) {
-        return authorService.findByAuthorNameLoose(name);
+    public List<AuthorResponse> searchLoose(@RequestParam String name) {
+        return authorService.findByAuthorNameLoose(name)
+            .stream()
+            .map(AuthorResponse::from)
+            .toList();
     }    
 
     @DeleteMapping("/{id}")

@@ -2,16 +2,18 @@ package com.example.LibraryManagementSystem.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.entity.Book;
+import com.example.LibraryManagementSystem.dto.book.BookRequest;
+import com.example.LibraryManagementSystem.dto.book.BookResponse;
 import com.example.LibraryManagementSystem.service.BookService;
 
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,40 +34,47 @@ public class BookController {
     }
     
     @PostMapping
-    public Book create(@Valid @RequestBody Book book, 
-                    @RequestParam Long categoryId, 
-                    @RequestParam List<Long> authorIds) {
-        return bookService.save(book, categoryId, authorIds);
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookResponse create(@Valid @RequestBody BookRequest request) {
+
+        return BookResponse.from(bookService.save(request));
     }
     
     @PutMapping("/{id}")
-    public Book update(@PathVariable Long id,
-                    @Valid @RequestBody Book book,
-                    @RequestParam Long categoryId,
-                    @RequestParam List<Long> authorIds){
+    public BookResponse update(
+        @PathVariable Long id,
+        @Valid @RequestBody BookRequest request){
 
-        return bookService.update(id, book, categoryId, authorIds);
+        return BookResponse.from(bookService.update(id, request));
     }
     
     @GetMapping
-    public List<Book> getAll(){
-        return bookService.findAll();
+    public List<BookResponse> getAll(){
+        return bookService.findAll()
+            .stream()
+            .map(BookResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<Book> getById(@PathVariable Long id) {
-        return bookService.findById(id);
+    public BookResponse getById(@PathVariable Long id) {
+        return BookResponse.from(
+            bookService.findById(id)
+        );
     }
     
 
     @GetMapping("/search/full-title")
-    public Book findByTitle(@RequestParam String title){
-        return bookService.findByTitle(title);
+    public BookResponse findByTitle(@RequestParam String title){
+        return BookResponse.from(bookService.findByTitle(title));
     }
     
     @GetMapping("/search")
-    public List<Book> searchLoose(@RequestParam String title){
-        return bookService.findByTitleLoose(title);
+    public List<BookResponse> searchLoose(@RequestParam String title){
+        return bookService.findByTitleLoose(title)
+            .stream()
+            .map(BookResponse::from)
+            .toList();
     }
 
     @DeleteMapping("/{id}")

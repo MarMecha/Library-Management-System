@@ -1,4 +1,4 @@
-package com.example.LibraryManagementSystem.dto.LoanDtos;
+package com.example.LibraryManagementSystem.dto.loan;
 
 import java.time.LocalDate;
 

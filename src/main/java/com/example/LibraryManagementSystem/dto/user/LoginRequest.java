@@ -1,4 +1,4 @@
-package com.example.LibraryManagementSystem.dto.UserDtos;
+package com.example.LibraryManagementSystem.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,7 +1,5 @@
 package com.example.LibraryManagementSystem.controller;
 
-import com.example.LibraryManagementSystem.dto.UserDtos.RegisterRequest;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.LibraryManagementSystem.dto.UserDtos.AuthResponse;
-import com.example.LibraryManagementSystem.dto.UserDtos.LoginRequest;
+import com.example.LibraryManagementSystem.dto.user.AuthResponse;
+import com.example.LibraryManagementSystem.dto.user.LoginRequest;
+import com.example.LibraryManagementSystem.dto.user.RegisterRequest;
 import com.example.LibraryManagementSystem.service.AuthService;
 
 import jakarta.validation.Valid;

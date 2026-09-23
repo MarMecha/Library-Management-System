@@ -1,4 +1,4 @@
-package com.example.LibraryManagementSystem.dto.UserDtos;
+package com.example.LibraryManagementSystem.dto.user;
 
 import com.example.LibraryManagementSystem.entity.Role;
 import com.example.LibraryManagementSystem.entity.User;

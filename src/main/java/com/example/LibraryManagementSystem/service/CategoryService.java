@@ -6,8 +6,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
+import com.example.LibraryManagementSystem.dto.category.CategoryRequest;
 import com.example.LibraryManagementSystem.entity.Category;
 import com.example.LibraryManagementSystem.exception.CategoryAlreadyExistsException;
+import com.example.LibraryManagementSystem.exception.CategoryNotFoundException;
 import com.example.LibraryManagementSystem.repository.CategoryRepository;
 
 
@@ -19,16 +23,18 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Category save(Category category){
-        String normalizedName = category.getName()
+    public Category save(CategoryRequest request){
+        String normalizedName = request.name()
                 .trim()
-                .toUpperCase();
+                .toUpperCase(Locale.ROOT);
 
-        if (categoryRepository.existsByName(normalizedName)) {
+        if (categoryRepository.existsByNameIgnoreCase(normalizedName)) {
             throw new CategoryAlreadyExistsException(
-                    "Category already exists"
+                "Category already exists"
             );
         }
+
+        Category category = new Category();
 
         category.setName(normalizedName);
 
@@ -51,7 +57,7 @@ public class CategoryService {
         return categoryRepository
             .findByNameIgnoreCase(name.trim())
             .orElseThrow(()->
-                new RuntimeException("Category not found!")
+                new CategoryNotFoundException("Category not found!")
             );
     }
 
@@ -60,17 +66,18 @@ public class CategoryService {
                 .findByNameContainingIgnoreCase(name.trim());
     }
 
-    public Category update(Long id, Category category){
+    public Category update(Long id, CategoryRequest request){
         
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Category not found"));
+                        new CategoryNotFoundException("Category not found!")
+                    );
 
-        String normalizedName = category.getName()
+        String normalizedName = request.name()
                 .trim()
-                .toUpperCase();
+                .toUpperCase(Locale.ROOT);
 
-        if (categoryRepository.existsByNameAndIdNot(
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(
                 normalizedName, id)) {
 
             throw new CategoryAlreadyExistsException(
