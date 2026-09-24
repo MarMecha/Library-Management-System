@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.LibraryManagementSystem.entity.Book;
 import com.example.LibraryManagementSystem.entity.Loan;
@@ -270,6 +275,35 @@ public class LoanServiceTest {
         assertEquals(0, result.getFineAmount());
 
         verify(loanRepository).save(loan);
+    }
+
+    @Test
+    void findAll_shouldReturnRequestedPage() {
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Loan firstLoan = new Loan();
+        firstLoan.setId(1L);
+
+        Loan secondLoan = new Loan();
+        secondLoan.setId(2L);
+
+        Page<Loan> repositoryPage = new PageImpl<>(
+            List.of(firstLoan, secondLoan),
+            pageable,
+            5
+        );
+
+        when(loanRepository.findAll(pageable))
+            .thenReturn(repositoryPage);
+
+        Page<Loan> result = loanService.findAll(pageable);
+
+        assertEquals(2, result.getContent().size());
+        assertEquals(5, result.getTotalElements());
+        assertEquals(3, result.getTotalPages());
+        assertSame(firstLoan, result.getContent().get(0));
+
+        verify(loanRepository).findAll(pageable);
     }
 }
 

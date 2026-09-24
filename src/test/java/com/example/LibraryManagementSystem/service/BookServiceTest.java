@@ -17,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.LibraryManagementSystem.dto.book.BookRequest;
 import com.example.LibraryManagementSystem.entity.Author;
@@ -291,5 +295,40 @@ class BookServiceTest {
 
         verify(bookRepository, never())
             .save(any(Book.class));
+    }
+    @Test
+    void findAll_shouldReturnRequestedPage() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 2);
+    
+        Book firstBook = new Book();
+        firstBook.setId(1L);
+        firstBook.setTitle("Clean Code");
+    
+        Book secondBook = new Book();
+        secondBook.setId(2L);
+        secondBook.setTitle("Inferno");
+    
+        Page<Book> repositoryPage = new PageImpl<>(
+            List.of(firstBook, secondBook),
+            pageable,
+            4
+        );
+    
+        when(bookRepository.findAll(pageable))
+            .thenReturn(repositoryPage);
+    
+        // Act
+        Page<Book> result = bookService.findAll(pageable);
+    
+        // Assert
+        assertEquals(2, result.getContent().size());
+        assertEquals(4, result.getTotalElements());
+        assertEquals(2, result.getTotalPages());
+        assertEquals(0, result.getNumber());
+        assertSame(firstBook, result.getContent().get(0));
+        assertSame(secondBook, result.getContent().get(1));
+    
+        verify(bookRepository).findAll(pageable);
     }
 }

@@ -18,6 +18,8 @@ import com.example.LibraryManagementSystem.repository.AuthorRepository;
 import com.example.LibraryManagementSystem.repository.BookRepository;
 import com.example.LibraryManagementSystem.repository.CategoryRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class BookService {
@@ -120,8 +122,8 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    public List<Book> findAll(){
-        return bookRepository.findAll();
+    public Page<Book> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 
     public Book findById(Long id){

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.LibraryManagementSystem.dto.category.CategoryRequest;
 import com.example.LibraryManagementSystem.entity.Category;
@@ -156,5 +161,36 @@ class CategoryServiceTest {
 
         verify(categoryRepository, never())
             .save(any(Category.class));
+    }
+
+    @Test
+    void findAll_shouldReturnRequestedPage() {
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Category firstCategory = new Category();
+        firstCategory.setId(1L);
+        firstCategory.setName("FANTASY");
+
+        Category secondCategory = new Category();
+        secondCategory.setId(2L);
+        secondCategory.setName("HORROR");
+
+        Page<Category> repositoryPage = new PageImpl<>(
+            List.of(firstCategory, secondCategory),
+            pageable,
+            4
+        );
+
+        when(categoryRepository.findAll(pageable))
+            .thenReturn(repositoryPage);
+
+        Page<Category> result = categoryService.findAll(pageable);
+
+        assertEquals(2, result.getContent().size());
+        assertEquals(4, result.getTotalElements());
+        assertEquals(2, result.getTotalPages());
+        assertSame(firstCategory, result.getContent().get(0));
+
+        verify(categoryRepository).findAll(pageable);
     }
 }

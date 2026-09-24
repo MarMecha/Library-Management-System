@@ -1,0 +1,61 @@
+name: Backend Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and run tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+
+        env:
+          POSTGRES_DB: LibraryManagementSystem
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: LibraryManagementSystem
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: LibraryManagementSystem/pom.xml
+
+      - name: Generate temporary JWT secret
+        shell: bash
+        run: echo "JWT_SECRET=$(openssl rand -base64 32 | tr -d '\n')" >> "$GITHUB_ENV"
+
+      - name: Run Maven tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/LibraryManagementSystem
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+        run: mvn --batch-mode --no-transfer-progress test

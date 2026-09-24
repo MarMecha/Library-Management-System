@@ -1,5 +1,6 @@
 package com.example.LibraryManagementSystem.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -78,19 +83,31 @@ class LoanControllerSecurityTest {
         mockMvc.perform(get("/loans"))
             .andExpect(status().isForbidden());
 
-        verify(loanService, never()).findAll();
+        verify(loanService, never())
+            .findAll(any(Pageable.class));
     }
 
     @Test
     @WithMockUser(username = "admin@example.com", roles = "ADMIN")
     void getAllLoans_shouldReturnOk_whenUserIsAdmin()
             throws Exception {
-        when(loanService.findAll()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(
+            0,
+            10,
+            Sort.by("loanDate").descending()
+        );
+
+        when(loanService.findAll(any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
         mockMvc.perform(get("/loans"))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.page").value(0))
+            .andExpect(jsonPath("$.size").value(10))
+            .andExpect(jsonPath("$.totalElements").value(0));
 
-        verify(loanService).findAll();
+        verify(loanService).findAll(any(Pageable.class));
     }
 
     @Test

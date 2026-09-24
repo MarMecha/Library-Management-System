@@ -48,7 +48,14 @@ public class SecurityConfig {
                 )
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/error").permitAll()
+                .requestMatchers(
+                    "/auth/**",
+                    "/error",
+                    "/v3/api-docs/**",
+                    "/v3/api-docs.yaml",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
 
                 .requestMatchers(HttpMethod.GET,
                                 "/loans/me",

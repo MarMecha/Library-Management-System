@@ -13,7 +13,7 @@ A secure REST API for managing a library's catalog, users, and lending workflow.
 | JWT authentication | Complete |
 | Role-based authorization | Complete |
 | Validation and exception handling | Complete |
-| Unit and security tests | 58 tests passing |
+| Unit and security tests | 63 tests passing |
 | Swagger / OpenAPI documentation | Complete |
 | CI/CD pipeline | Planned |
 | Docker support | Planned |

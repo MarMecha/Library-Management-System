@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.LibraryManagementSystem.entity.Book;
@@ -114,8 +116,8 @@ public class LoanService {
         return loanRepository.save(loan);
     }
 
-    public List<Loan> findAll(){
-        return loanRepository.findAll();
+    public Page<Loan> findAll(Pageable pageable){
+        return loanRepository.findAll(pageable);
     }
 
     public Loan findById(Long loanId){

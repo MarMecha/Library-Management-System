@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.example.LibraryManagementSystem.dto.author.AuthorRequest;
 import com.example.LibraryManagementSystem.entity.Author;
@@ -181,5 +186,43 @@ class AuthorServiceTest {
 
         verify(authorRepository, never())
             .save(any(Author.class));
+    }
+
+    @Test
+    void findAll_shouldReturnRequestedPage() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Author firstAuthor = new Author();
+        firstAuthor.setId(1L);
+        firstAuthor.setFirstName("GEORGE");
+        firstAuthor.setLastName("ORWELL");
+
+        Author secondAuthor = new Author();
+        secondAuthor.setId(2L);
+        secondAuthor.setFirstName("DAN");
+        secondAuthor.setLastName("BROWN");
+
+        Page<Author> repositoryPage = new PageImpl<>(
+            List.of(firstAuthor, secondAuthor),
+            pageable,
+            4
+        );
+
+        when(authorRepository.findAll(pageable))
+            .thenReturn(repositoryPage);
+
+        // Act
+        Page<Author> result = authorService.findAll(pageable);
+
+        // Assert
+        assertEquals(2, result.getContent().size());
+        assertEquals(4, result.getTotalElements());
+        assertEquals(2, result.getTotalPages());
+        assertEquals(0, result.getNumber());
+        assertSame(firstAuthor, result.getContent().get(0));
+        assertSame(secondAuthor, result.getContent().get(1));
+
+        verify(authorRepository).findAll(pageable);
     }
 }

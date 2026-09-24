@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.LibraryManagementSystem.dto.author.AuthorRequest;
@@ -78,8 +80,8 @@ public class AuthorService {
         return authorRepository.save(existingAuthor);
     }
 
-    public List<Author> findAll(){
-        return authorRepository.findAll();
+    public Page<Author> findAll(Pageable pageable){
+        return authorRepository.findAll(pageable);
     }
 
     public Optional<Author> findById(Long id){

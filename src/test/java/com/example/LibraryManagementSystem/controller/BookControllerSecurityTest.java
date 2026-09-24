@@ -20,6 +20,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.example.LibraryManagementSystem.config.SecurityConfig;
 import com.example.LibraryManagementSystem.dto.book.BookRequest;
@@ -57,7 +61,8 @@ class BookControllerSecurityTest {
         mockMvc.perform(get("/books"))
             .andExpect(status().isUnauthorized());
 
-        verify(bookService, never()).findAll();
+        verify(bookService, never())
+            .findAll(any(Pageable.class));
     }
 
     @Test
@@ -68,13 +73,38 @@ class BookControllerSecurityTest {
     void getBooks_shouldReturnOk_whenUserIsAuthenticated()
             throws Exception {
 
-        when(bookService.findAll())
-            .thenReturn(List.of());
+            Pageable pageable = PageRequest.of(
+            0,
+            2,
+            Sort.by("title").ascending()
+        );
 
-        mockMvc.perform(get("/books"))
-            .andExpect(status().isOk());
+        when(bookService.findAll(any(Pageable.class)))
+            .thenReturn(
+                new PageImpl<>(
+                    List.of(),
+                    pageable,
+                    0
+                )
+            );
 
-        verify(bookService).findAll();
+        mockMvc.perform(
+                get("/books")
+                    .param("page", "0")
+                    .param("size", "2")
+                    .param("sort", "title,asc")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.page").value(0))
+            .andExpect(jsonPath("$.size").value(2))
+            .andExpect(jsonPath("$.totalElements").value(0))
+            .andExpect(jsonPath("$.totalPages").value(0))
+            .andExpect(jsonPath("$.first").value(true))
+            .andExpect(jsonPath("$.last").value(true));
+
+        verify(bookService)
+            .findAll(any(Pageable.class));
     }
 
     @Test
@@ -228,4 +258,5 @@ class BookControllerSecurityTest {
             .andExpect(jsonPath("$.error")
                 .value("Resource already exists"));
     }
+    
 }
