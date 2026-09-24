@@ -15,7 +15,7 @@ A secure REST API for managing a library's catalog, users, and lending workflow.
 | Validation and exception handling | Complete |
 | Unit and security tests | 63 tests passing |
 | Swagger / OpenAPI documentation | Complete |
-| CI/CD pipeline | Planned |
+| CI/CD pipeline | Complete |
 | Docker support | Planned |
 | Frontend application | Planned |
 | Production deployment | Not started |
@@ -193,7 +193,7 @@ Secrets and database credentials must be provided through environment variables 
 
 ### Next step
 
-- [ ] Add a GitHub Actions workflow that builds the project and runs all tests on every push and pull request
+- [x] Add a GitHub Actions workflow that builds the project and runs all tests on every push and pull request
 
 ### Planned
 
