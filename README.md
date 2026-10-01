@@ -159,6 +159,18 @@ The API will be available at:
 http://localhost:8080
 ```
 
+```markdown
+## Running with Docker
+
+Docker Compose can run the Spring Boot API and PostgreSQL together without requiring a local PostgreSQL installation.
+
+### 1. Create the environment file
+
+Copy the provided template:
+
+```powershell
+Copy-Item .env.example .env
+
 ## Running the Tests
 
 Ensure the required environment variables are available, then run:
@@ -191,14 +203,13 @@ Secrets and database credentials must be provided through environment variables 
 
 ## Roadmap
 
-### Next step
+### Completed infrastructure
 
-- [x] Add a GitHub Actions workflow that builds the project and runs all tests on every push and pull request
+- [x] Add a GitHub Actions workflow that builds and tests every push and pull request
+- [x] Add Docker support for the Spring Boot API
+- [x] Add Docker Compose for the API and PostgreSQL
 
-### Planned
-
-- [ ] Add Docker support for the Spring Boot API
-- [ ] Add Docker Compose for the API and PostgreSQL
+### Next milestones
 - [ ] Develop a responsive frontend application
 - [ ] Add frontend authentication and role-based navigation
 - [ ] Connect the frontend to the REST API
@@ -219,7 +230,7 @@ The project has completed its core backend phase:
 - Automated tests
 - OpenAPI documentation
 
-The recommended next milestone is **continuous integration with GitHub Actions**, followed by Dockerization and frontend development.
+The recommended next milestone is **frontend development**, followed by database migrations and production deployment.
 
 ## Author
 
