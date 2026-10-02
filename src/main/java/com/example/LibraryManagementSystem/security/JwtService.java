@@ -42,6 +42,14 @@ public class JwtService {
         // PayLoad: subject , issuedAt , Expiration 
         return Jwts.builder()
             .subject(userDetails.getUsername()) //το username είναι το email.
+            .claim(
+                "role",
+                userDetails.getAuthorities()
+                    .stream()
+                    .findFirst()
+                    .map(authority -> authority.getAuthority().replace("ROLE_", ""))
+                    .orElse("")
+            )
             .issuedAt(new Date(currentTime))
             .expiration(new Date(currentTime + jwtExpiration))
             .signWith(getSigningKey()) //Υπογράφει το token. Αν κάποιος αλλάξει το payload, η υπογραφή δεν θα ταιριάζει.
@@ -58,6 +66,10 @@ public class JwtService {
     
     public String extractUsername(String token){
         return extractAllClaims(token).getSubject();
+    }
+
+    public String extractRole(String token){
+        return extractAllClaims(token).get("role", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){

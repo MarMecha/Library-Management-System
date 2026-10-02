@@ -48,10 +48,15 @@ public class BookService {
             );
         }
         
-        Category category = categoryRepository.findById(request.categoryId())
+        Set<Category> categories = new HashSet<>();
+
+        for (Long categoryId : request.categoryIds()){
+            Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() ->
-                        new CategoryNotFoundException("Category not found!")
+                    new CategoryNotFoundException("Category not found!")
                 );
+            categories.add(category);
+        }
 
         Set<Author> authors = new HashSet<>();
 
@@ -69,7 +74,7 @@ public class BookService {
         book.setIsbn(normalizedIsbn);
         book.setPublicationYear(request.publicationYear());
         book.setTotalCopies(request.totalCopies());
-        book.setCategory(category);
+        book.setCategories(categories);
         book.setAuthors(authors);
 
         return bookRepository.save(book);
@@ -92,10 +97,15 @@ public class BookService {
             );
         }
 
-        Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> 
+        Set<Category> categories = new HashSet<>();
+
+        for (Long categoryId : request.categoryIds()){
+            Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
                     new CategoryNotFoundException("Category not found!")
-            );
+                );
+            categories.add(category);
+        }
 
         Set<Author> authors = new HashSet<>();
 
@@ -112,7 +122,7 @@ public class BookService {
         existingBook.setIsbn(normalizedIsbn);
         existingBook.setPublicationYear(request.publicationYear());
         existingBook.setTotalCopies(request.totalCopies());
-        existingBook.setCategory(category);
+        existingBook.setCategories(categories);
         existingBook.setAuthors(authors);
 
         return bookRepository.save(existingBook);

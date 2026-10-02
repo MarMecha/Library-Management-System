@@ -12,7 +12,7 @@ public record BookResponse(
     String isbn,
     Integer publicationYear,
     Integer totalCopies,
-    CategoryResponse category,
+    List<CategoryResponse> categories,
     List<AuthorResponse> authors
 ) {
     
@@ -23,13 +23,19 @@ public record BookResponse(
                 .map(AuthorResponse::from)
                 .toList();
 
+        List<CategoryResponse> categoryResponses =
+            book.getCategories()
+                .stream()
+                .map(CategoryResponse::from)
+                .toList();
+
         return new BookResponse(
             book.getId(), 
             book.getTitle(), 
             book.getIsbn(), 
             book.getPublicationYear(), 
             book.getTotalCopies(), 
-            CategoryResponse.from(book.getCategory()), 
+            categoryResponses,
             authorResponses
         );
     }

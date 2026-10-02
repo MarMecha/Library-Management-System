@@ -57,7 +57,7 @@ class BookServiceTest {
             " isbn-123 ", 
             2008, 
             3, 
-            1L, 
+            List.of(1L),
             List.of(2L)
         );
 
@@ -87,7 +87,7 @@ class BookServiceTest {
         assertEquals("ISBN-123", result.getIsbn());
         assertEquals(2008, result.getPublicationYear());
         assertEquals(3, result.getTotalCopies());
-        assertSame(category, result.getCategory());
+        assertTrue(result.getCategories().contains(category));
         assertTrue(result.getAuthors().contains(author));
 
         verify(bookRepository).save(any(Book.class));
@@ -101,7 +101,7 @@ class BookServiceTest {
             "isbn-123", 
             2008, 
             3, 
-            1L, 
+            List.of(1L),
             List.of(2L)
         );
 
@@ -126,7 +126,7 @@ class BookServiceTest {
             "isbn-123", 
             2008, 
             3, 
-            999L, 
+            List.of(999L),
             List.of(2L)
         );
         
@@ -154,7 +154,7 @@ class BookServiceTest {
             "isbn-123", 
             2008, 
             3, 
-            1L, 
+            List.of(1L),
             List.of(999L)
         );
 
@@ -191,7 +191,7 @@ class BookServiceTest {
             " isbn-123 ", 
             2008, 
             3, 
-            1L, 
+            List.of(1L),
             List.of(2L)
         );
 
@@ -230,7 +230,7 @@ class BookServiceTest {
         assertEquals("ISBN-123", result.getIsbn());
         assertEquals(2008, result.getPublicationYear());
         assertEquals(3, result.getTotalCopies());
-        assertSame(category, result.getCategory());
+        assertTrue(result.getCategories().contains(category));
         assertTrue(result.getAuthors().contains(author));
 
         verify(bookRepository).save(any(Book.class));
@@ -245,7 +245,7 @@ class BookServiceTest {
             " isbn-123 ", 
             2008, 
             3, 
-            1L, 
+            List.of(1L),
             List.of(2L)
         );
 
@@ -272,7 +272,7 @@ class BookServiceTest {
             " duplicate-isbn ",
             2008,
             5,
-            1L,
+            List.of(1L),
             List.of(2L)
         );
 

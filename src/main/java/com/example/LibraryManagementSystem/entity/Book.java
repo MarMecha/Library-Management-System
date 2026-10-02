@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -46,12 +45,16 @@ public class Book {
     @Column(nullable = false)
     private Integer totalCopies;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @ManyToMany
+    @JoinTable(
+        name = "book_categories",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
 
-    public Category getCategory(){return category;}
-    public void setCategory(Category category){this.category = category;}
+    public Set<Category> getCategories(){return categories;}
+    public void setCategories(Set<Category> categories){this.categories = categories;}
     
     @ManyToMany
     @JoinTable(

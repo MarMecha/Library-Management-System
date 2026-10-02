@@ -60,6 +60,15 @@ class JwtServiceTest {
     }
 
     @Test
+    void generateToken_shouldContainRole() {
+        // Act
+        String token = jwtService.generateToken(userDetails);
+
+        // Assert
+        assertEquals("MEMBER", jwtService.extractRole(token));
+    }
+
+    @Test
     void isTokenValid_shouldReturnFalse_whenUsernameDoesNotMatch() {
         // Arrange
         String token = jwtService.generateToken(userDetails);

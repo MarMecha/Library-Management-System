@@ -22,8 +22,8 @@ public record BookRequest(
     @Positive(message = "Total copies must be positive")
     Integer totalCopies,
 
-    @NotNull(message = "Category ID is required!")
-    Long categoryId,
+    @NotEmpty(message = "At least one category is required!")
+    List<Long> categoryIds,
 
     @NotEmpty(message = "At least one author is required!")
     List<Long> authorIds

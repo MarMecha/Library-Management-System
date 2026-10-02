@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +122,7 @@ class BookControllerSecurityTest {
               "isbn": "ISBN-123",
               "publicationYear": 2008,
               "totalCopies": 3,
-              "categoryId": 1,
+              "categoryIds": [1],
               "authorIds": [2]
             }
             """;
@@ -155,7 +156,7 @@ class BookControllerSecurityTest {
         savedBook.setIsbn("ISBN-123");
         savedBook.setPublicationYear(2008);
         savedBook.setTotalCopies(3);
-        savedBook.setCategory(category);
+        savedBook.setCategories(Set.of(category));
 
         when(bookService.save(any(BookRequest.class)))
             .thenReturn(savedBook);
@@ -166,7 +167,7 @@ class BookControllerSecurityTest {
               "isbn": "ISBN-123",
               "publicationYear": 2008,
               "totalCopies": 3,
-              "categoryId": 1,
+              "categoryIds": [1],
               "authorIds": [2]
             }
             """;
@@ -179,7 +180,7 @@ class BookControllerSecurityTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").value(12))
             .andExpect(jsonPath("$.title").value("Clean Code"))
-            .andExpect(jsonPath("$.category.name")
+            .andExpect(jsonPath("$.categories[0].name")
                 .value("PROGRAMMING"));
 
         verify(bookService)
@@ -200,7 +201,7 @@ class BookControllerSecurityTest {
               "isbn": "",
               "publicationYear": -1,
               "totalCopies": 0,
-              "categoryId": null,
+              "categoryIds": [],
               "authorIds": []
             }
             """;
@@ -244,7 +245,7 @@ class BookControllerSecurityTest {
               "isbn": "ISBN-123",
               "publicationYear": 2008,
               "totalCopies": 3,
-              "categoryId": 1,
+              "categoryIds": [1],
               "authorIds": [2]
             }
             """;
